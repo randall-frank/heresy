@@ -136,25 +136,28 @@ class Renderer(object):
     def make_gfx_items(self, r):
         objs = list()
         # return a list of QGraphicsItem objects in order top to bottom
-        if isinstance(r, card_objects.TextRender):
-            # actual text item
-            obj = QtWidgets.QGraphicsTextItem()
-            base_style = self.deck.find_style(r.style)
-            doc = self.build_text_document(r.text, base_style)
-            obj.setDocument(doc)
-            # some defaults
-            obj.setDefaultTextColor(QtGui.QColor(base_style.textcolor[0],
-                                                 base_style.textcolor[1],
-                                                 base_style.textcolor[2],
-                                                 base_style.textcolor[3]))
-            obj.setTextWidth(r.rectangle[2])
-            obj.setX(r.rectangle[0])    # x,y,dx,dy
-            obj.setY(r.rectangle[1])
-            # compute the bounding box and snag the height for the backdrop...
-            obj.adjustSize()
-            height = int(obj.boundingRect().height())
-            obj.setRotation(r.rotation)
-            objs.append(obj)
+        if isinstance(r, card_objects.TextRender) or isinstance(r, card_objects.RectRender):
+            height = r.rectangle[3]
+            if isinstance(r, card_objects.TextRender):
+                # actual text item
+                obj = QtWidgets.QGraphicsTextItem()
+                base_style = self.deck.find_style(r.style)
+                doc = self.build_text_document(r.text, base_style)
+                obj.setDocument(doc)
+                # some defaults
+                obj.setDefaultTextColor(QtGui.QColor(base_style.textcolor[0],
+                                                     base_style.textcolor[1],
+                                                     base_style.textcolor[2],
+                                                     base_style.textcolor[3]))
+                obj.setTextWidth(r.rectangle[2])
+                obj.setX(r.rectangle[0])    # x,y,dx,dy
+                obj.setY(r.rectangle[1])
+                # compute the bounding box and snag the height for the backdrop...
+                obj.adjustSize()
+                if height <= 0:
+                    height = int(obj.boundingRect().height())
+                obj.setRotation(r.rotation)
+                objs.append(obj)
             # backdrop
             obj = QtWidgets.QGraphicsRectItem(r.rectangle[0], r.rectangle[1], r.rectangle[2], height)
             obj.setTransformOriginPoint(QtCore.QPointF(r.rectangle[0], r.rectangle[1]))
